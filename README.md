@@ -14,7 +14,7 @@
 
 > Python wrapper over [Speedtest by Ookla](https://www.speedtest.net) source to test your internet connection bandwidth.
 
-_**Note**: project is under construction_
+⚠️ _**Note**: project is under construction_
 
 ## Tools
 
