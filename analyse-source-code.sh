@@ -49,7 +49,8 @@ remove-pycache() {
     Removes python cache directories
 DOC
     (
-      find "${CURRENT_DIR}" -depth -name ${PYCACHE_DIR} | xargs rm -r
+      # Use -exec to avoid xargs edge cases on different OSes.
+      find "${CURRENT_DIR}" -depth -name "${PYCACHE_DIR}" -type d -exec rm -rf {} +
     ) || echo "No ${PYCACHE_DIR} dir found"
 }
 
@@ -112,7 +113,7 @@ check-pylint() {
     Runs "pylint" code analyser
 DOC
    (
-     logging-box "pylint" && find ${PACKAGE} -type f -name "*.py" | xargs pylint
+     logging-box "pylint" && find "${PACKAGE}" -type f -name "*.py" -print0 | xargs -0 pylint
    ) || error-message "pylint analysis is failed"
 }
 

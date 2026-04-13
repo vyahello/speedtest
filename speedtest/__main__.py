@@ -1,11 +1,6 @@
 """Represents executable entrypoint for `speedtest` application."""
 
-
-def main() -> None:
-    """Runs `speedtest` application."""
-
-    pass
-
+from speedtest.cli import main
 
 if __name__ == "__main__":
     main()

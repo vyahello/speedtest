@@ -29,3 +29,6 @@ dist/
 build/
 *.egg-info
 
+# vscode
+.vscode/
+settings.json

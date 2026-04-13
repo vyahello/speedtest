@@ -10,21 +10,26 @@
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE.md)
 [![EO principles respected here](https://www.elegantobjects.org/badge.svg)](https://www.elegantobjects.org)
 
-# Speedtest
+## Speedtest
 
-> Python wrapper over [Speedtest by Ookla](https://www.speedtest.net) source to test your internet connection bandwidth.
+Small, fast **network speedtest CLI utility** written in Python.
 
-⚠️ _**Note**: project is under construction_
+It measures:
+- **Latency + jitter** (multiple quick HTTP requests)
+- **Download speed**
+- **Upload speed**
+
+By default it tests against Cloudflare’s public speedtest endpoints:
+`https://speed.cloudflare.com/__down` and `https://speed.cloudflare.com/__up`.
 
 ## Tools
 
 ### Production
 
-- python 3.6, 3.7, 3.8
+- python **3.10+**
 
 ### Development
 
-- [travis](https://travis-ci.org/) CI
 - [pytest](https://pypi.org/project/pytest/)
 - [black](https://black.readthedocs.io/en/stable/)
 - [mypy](http://mypy.readthedocs.io/en/latest)
@@ -36,7 +41,44 @@
 
 ### Quick start
 
-TBD
+Install editable (recommended for development):
+
+```bash
+pip install -e . -r requirements-dev.txt
+```
+
+Run (default profile: **standard**, more realistic / slightly longer):
+
+```bash
+speedtest
+```
+
+Or:
+
+```bash
+python -m speedtest
+```
+
+JSON output:
+
+```bash
+speedtest --json
+```
+
+Adjust test sizes (bytes):
+
+```bash
+speedtest --download-bytes 20000000 --upload-bytes 8000000
+```
+
+Profiles:
+
+```bash
+speedtest --profile fast
+speedtest --profile medium
+speedtest --profile standard
+speedtest --profile extended
+```
 
 ## Development notes
 
@@ -51,9 +93,9 @@ pytest
 
 ### CI
 
-Project has Travis CI integration using [.travis.yml](.travis.yml) file thus code analysis (`black`, `pylint`, `flake8`, `mypy`, `pydocstyle` and `interrogate`) and unittests (`pytest`) will be run automatically after every made change to the repository.
+CI runs on **GitHub Actions** and executes `./analyse-source-code.sh` on Python 3.10–3.14.
 
-To be able to run code analysis, please execute command below:
+To run the same checks locally:
 ```bash
 ./analyse-source-code.sh
 ```
@@ -69,8 +111,8 @@ Distributed under the `MIT` license. See [license](LICENSE.md) for more informat
 
 You can reach out me at:
 * [vyahello@gmail.com](vyahello@gmail.com)
-* [https://twitter.com/vyahello](https://twitter.com/vyahello)
-* [https://www.linkedin.com/in/volodymyr-yahello-821746127/](https://www.linkedin.com/in/volodymyr-yahello-821746127/)
+* [https://x.com/vyahello](https://x.com/vyahello)
+* [https://www.linkedin.com/in/volodymyr-yahello](https://www.linkedin.com/in/volodymyr-yahello)
 
 ### Contributing
 I would highly appreciate any contribution and support. If you are interested to add your ideas into project please follow next simple steps:

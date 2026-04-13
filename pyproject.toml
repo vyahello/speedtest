@@ -1,11 +1,50 @@
+[build-system]
+requires = ["setuptools>=70", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "speedtest"
+version = "0.1.0"
+description = "A small Python CLI utility to measure network speed."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { file = "LICENSE.md" }
+authors = [{ name = "Volodymyr Yahello", email = "vyahello@gmail.com" }]
+keywords = ["speedtest", "network", "cli", "bandwidth", "latency"]
+classifiers = [
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
+]
+dependencies = ["rich>=13.9.0,<14"]
+
+[project.urls]
+Homepage = "https://github.com/vyahello/speedtest"
+Repository = "https://github.com/vyahello/speedtest"
+
+[project.scripts]
+speedtest = "speedtest.cli:main"
+
+[tool.setuptools]
+packages = ["speedtest"]
+
 [tool.black]
 line-length = 100
 skip-string-normalization = true
-target-version = ["py36", "py37", "py38"]
+target-version = ["py310", "py311", "py312", "py313"]
 exclude = '''
 /(
     \.pytest_cache
     \.mypy_cache
+    \.venv
+    build
+    dist
 )/
 '''
 
@@ -19,8 +58,8 @@ ignore-magic = false
 ignore-semiprivate = false
 ignore-private = false
 ignore-module = false
-fail-under = 60
-exclude = []
+fail-under = 80
+exclude = ["tests", ".github", "setup.py"]
 ignore-regex = ["^get$", "^mock_.*", ".*BaseClass.*"]
 verbose = 0
 quiet = false
