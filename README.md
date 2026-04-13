@@ -47,7 +47,7 @@ Install editable (recommended for development):
 pip install -e . -r requirements-dev.txt
 ```
 
-Run (default profile: **standard**, more realistic / slightly longer):
+Run:
 
 ```bash
 speedtest
@@ -65,32 +65,6 @@ speedtest
 └──────────┴──────────────────────────────┘
 ```
 
-Or:
-
-```bash
-python -m speedtest
-```
-
-JSON output:
-
-```bash
-speedtest --json
-```
-
-Adjust test sizes (bytes):
-
-```bash
-speedtest --download-bytes 20000000 --upload-bytes 8000000
-```
-
-Profiles:
-
-```bash
-speedtest --profile fast
-speedtest --profile medium
-speedtest --profile standard
-speedtest --profile extended
-```
 
 ## Development notes
 
