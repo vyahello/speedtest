@@ -51,6 +51,18 @@ Run (default profile: **standard**, more realistic / slightly longer):
 
 ```bash
 speedtest
+
+⠋ Running speedtest…
+             Speedtest results
+┏━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ Metric   ┃ Value                        ┃
+┡━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+│ Server   │ https://speed.cloudflare.com │
+│ Latency  │ 7523.7 ms                    │
+│ Jitter   │ 59.0 ms                      │
+│ Download │ 18.53 Mbps                   │
+│ Upload   │ 7.66 Mbps                    │
+└──────────┴──────────────────────────────┘
 ```
 
 Or:
