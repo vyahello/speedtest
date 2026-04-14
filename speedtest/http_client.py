@@ -31,46 +31,65 @@ def _ssl_context() -> ssl.SSLContext:
     return ssl.create_default_context()
 
 
+@dataclass(frozen=True, slots=True)
+class StdlibHttpClient:
+    """Small OO wrapper around `urllib.request`."""
+
+    user_agent: str = _UA
+
+    def get(
+        self, url: str, *, timeout_s: float, read_limit_bytes: int | None = None
+    ) -> HttpTimings:
+        """Perform a GET request and return timings."""
+
+        req = urllib.request.Request(url, method="GET", headers={"User-Agent": self.user_agent})
+        start = perf_counter()
+        transferred = 0
+        try:
+            with urllib.request.urlopen(req, timeout=timeout_s, context=_ssl_context()) as resp:
+                if read_limit_bytes is None:
+                    data = resp.read()
+                    transferred = len(data)
+                else:
+                    remaining = read_limit_bytes
+                    while remaining > 0:
+                        chunk = resp.read(min(remaining, 64 * 1024))
+                        if not chunk:
+                            break
+                        transferred += len(chunk)
+                        remaining -= len(chunk)
+        except (urllib.error.URLError, OSError) as exc:
+            raise HttpError(str(exc)) from exc
+        elapsed = perf_counter() - start
+        return HttpTimings(elapsed_s=elapsed, transferred_bytes=transferred)
+
+    def post(self, url: str, *, timeout_s: float, body_bytes: int) -> HttpTimings:
+        """Perform a POST request and return timings."""
+
+        payload = os.urandom(body_bytes)
+        req = urllib.request.Request(
+            url,
+            data=payload,
+            method="POST",
+            headers={"User-Agent": self.user_agent, "Content-Type": "application/octet-stream"},
+        )
+        start = perf_counter()
+        try:
+            with urllib.request.urlopen(req, timeout=timeout_s, context=_ssl_context()) as resp:
+                _ = resp.read(1)
+        except (urllib.error.URLError, OSError) as exc:
+            raise HttpError(str(exc)) from exc
+        elapsed = perf_counter() - start
+        return HttpTimings(elapsed_s=elapsed, transferred_bytes=len(payload))
+
+
 def http_get(url: str, *, timeout_s: float, read_limit_bytes: int | None = None) -> HttpTimings:
     """Perform a GET and read (optionally limited) response body."""
 
-    req = urllib.request.Request(url, method="GET", headers={"User-Agent": _UA})
-    start = perf_counter()
-    transferred = 0
-    try:
-        with urllib.request.urlopen(req, timeout=timeout_s, context=_ssl_context()) as resp:
-            if read_limit_bytes is None:
-                data = resp.read()
-                transferred = len(data)
-            else:
-                remaining = read_limit_bytes
-                while remaining > 0:
-                    chunk = resp.read(min(remaining, 64 * 1024))
-                    if not chunk:
-                        break
-                    transferred += len(chunk)
-                    remaining -= len(chunk)
-    except (urllib.error.URLError, OSError) as exc:
-        raise HttpError(str(exc)) from exc
-    elapsed = perf_counter() - start
-    return HttpTimings(elapsed_s=elapsed, transferred_bytes=transferred)
+    return StdlibHttpClient().get(url, timeout_s=timeout_s, read_limit_bytes=read_limit_bytes)
 
 
 def http_post(url: str, *, timeout_s: float, body_bytes: int) -> HttpTimings:
     """Perform a POST with a binary body of given size."""
 
-    payload = os.urandom(body_bytes)
-    req = urllib.request.Request(
-        url,
-        data=payload,
-        method="POST",
-        headers={"User-Agent": _UA, "Content-Type": "application/octet-stream"},
-    )
-    start = perf_counter()
-    try:
-        with urllib.request.urlopen(req, timeout=timeout_s, context=_ssl_context()) as resp:
-            _ = resp.read(1)
-    except (urllib.error.URLError, OSError) as exc:
-        raise HttpError(str(exc)) from exc
-    elapsed = perf_counter() - start
-    return HttpTimings(elapsed_s=elapsed, transferred_bytes=len(payload))
+    return StdlibHttpClient().post(url, timeout_s=timeout_s, body_bytes=body_bytes)

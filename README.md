@@ -41,9 +41,12 @@ By default it tests against Cloudflare’s public speedtest endpoints:
 
 ### Quick start
 
-Install editable (recommended for development):
+Install:
 
 ```bash
+git clone git@github.com:vyahello/speedtest.git && cd speedtest
+python3 -m venv .venv
+source .venv/bin/activate
 pip install -e . -r requirements-dev.txt
 ```
 
@@ -52,7 +55,6 @@ Run:
 ```bash
 speedtest
 
-⠋ Running speedtest…
              Speedtest results
 ┏━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Metric   ┃ Value                        ┃
