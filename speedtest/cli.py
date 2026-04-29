@@ -13,6 +13,8 @@ from rich.table import Table
 from speedtest.core import run_speedtest
 from speedtest.models import SpeedTestResult, SpeedTestSettings
 
+_err = Console(stderr=True)
+
 _PROFILES: dict[str, SpeedTestSettings] = {
     "fast": SpeedTestSettings(
         timeout_s=3.0,
@@ -77,10 +79,30 @@ def _result_table(settings: SpeedTestSettings, result: SpeedTestResult) -> Table
     return table
 
 
+def _validate_args(args: argparse.Namespace) -> None:
+    """Exit with an error message when numeric args are out of range."""
+
+    if args.timeout is not None and args.timeout <= 0:
+        _err.print("[bold red]error:[/bold red] --timeout must be > 0")
+        raise SystemExit(2)
+    if args.latency_requests is not None and args.latency_requests < 1:
+        _err.print("[bold red]error:[/bold red] --latency-requests must be >= 1")
+        raise SystemExit(2)
+    for flag, value in (
+        ("--download-bytes", args.download_bytes),
+        ("--upload-bytes", args.upload_bytes),
+        ("--warmup-bytes", args.warmup_bytes),
+    ):
+        if value is not None and value < 0:
+            _err.print(f"[bold red]error:[/bold red] {flag} must be >= 0")
+            raise SystemExit(2)
+
+
 def main(argv: list[str] | None = None) -> None:
     """Run the CLI."""
 
     args = _build_parser().parse_args(argv)
+    _validate_args(args)
     base = _PROFILES[str(args.profile)]
     settings = SpeedTestSettings(
         server=base.server if args.server is None else str(args.server),
@@ -97,17 +119,15 @@ def main(argv: list[str] | None = None) -> None:
 
     console = Console()
     try:
-        # Show a visual indicator while measurements run, but keep the final output
-        # limited to either JSON or the results table.
         with console.status("Running speedtest…", spinner="dots"):
             result = run_speedtest(settings)
     except Exception as exc:  # pylint: disable=broad-exception-caught
-        console.print(f"[bold red]error:[/bold red] {exc}")
+        _err.print(f"[bold red]error:[/bold red] {exc}")
         raise SystemExit(2) from exc
 
     if args.json:
         payload = {"settings": asdict(settings), "result": asdict(result)}
-        console.print(json.dumps(payload, indent=2, sort_keys=True))
+        print(json.dumps(payload, indent=2, sort_keys=True))
         return
 
     console.print(_result_table(settings, result))

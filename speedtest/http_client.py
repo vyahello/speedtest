@@ -11,6 +11,7 @@ from time import perf_counter
 from typing import Final
 
 _UA: Final[str] = "speedtest-python-cli/0.1 (+https://github.com/vyahello/speedtest)"
+_SSL_CTX: Final[ssl.SSLContext] = ssl.create_default_context()
 
 
 @dataclass(frozen=True, slots=True)
@@ -23,12 +24,6 @@ class HttpTimings:
 
 class HttpError(RuntimeError):
     """Raised when HTTP request fails."""
-
-
-def _ssl_context() -> ssl.SSLContext:
-    """Create an SSL context for outbound HTTPS requests."""
-
-    return ssl.create_default_context()
 
 
 @dataclass(frozen=True, slots=True)
@@ -46,7 +41,7 @@ class StdlibHttpClient:
         start = perf_counter()
         transferred = 0
         try:
-            with urllib.request.urlopen(req, timeout=timeout_s, context=_ssl_context()) as resp:
+            with urllib.request.urlopen(req, timeout=timeout_s, context=_SSL_CTX) as resp:
                 if read_limit_bytes is None:
                     data = resp.read()
                     transferred = len(data)
@@ -75,7 +70,7 @@ class StdlibHttpClient:
         )
         start = perf_counter()
         try:
-            with urllib.request.urlopen(req, timeout=timeout_s, context=_ssl_context()) as resp:
+            with urllib.request.urlopen(req, timeout=timeout_s, context=_SSL_CTX) as resp:
                 _ = resp.read(1)
         except (urllib.error.URLError, OSError) as exc:
             raise HttpError(str(exc)) from exc

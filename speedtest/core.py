@@ -27,16 +27,12 @@ class Transport(ABC):
         self, _url: str, *, timeout_s: float, read_limit_bytes: int | None = None
     ) -> HttpTimings:
         """Perform an HTTP GET and return timings."""
-
-        _ = (_url, timeout_s, read_limit_bytes)
-        raise NotImplementedError
+        ...
 
     @abstractmethod
     def post(self, _url: str, *, timeout_s: float, body_bytes: int) -> HttpTimings:
         """Perform an HTTP POST and return timings."""
-
-        _ = (_url, timeout_s, body_bytes)
-        raise NotImplementedError
+        ...
 
 
 @dataclass(frozen=True, slots=True)
@@ -171,19 +167,28 @@ def _jitter_ms(samples_ms: Iterable[float]) -> float:
 def measure_latency(settings: SpeedTestSettings) -> LatencyStats:
     """Measure unloaded latency using GET requests with bytes=0."""
 
-    return SpeedTester(settings=settings, transport=StdlibTransport()).measure_latency()
+    try:
+        return SpeedTester(settings=settings, transport=StdlibTransport()).measure_latency()
+    except HttpError as exc:
+        raise RuntimeError(f"Network measurement failed: {exc}") from exc
 
 
 def measure_download(settings: SpeedTestSettings) -> BandwidthStats:
     """Measure download bandwidth (Mbps) using a single request."""
 
-    return SpeedTester(settings=settings, transport=StdlibTransport()).measure_download()
+    try:
+        return SpeedTester(settings=settings, transport=StdlibTransport()).measure_download()
+    except HttpError as exc:
+        raise RuntimeError(f"Network measurement failed: {exc}") from exc
 
 
 def measure_upload(settings: SpeedTestSettings) -> BandwidthStats:
     """Measure upload bandwidth (Mbps) using a single request."""
 
-    return SpeedTester(settings=settings, transport=StdlibTransport()).measure_upload()
+    try:
+        return SpeedTester(settings=settings, transport=StdlibTransport()).measure_upload()
+    except HttpError as exc:
+        raise RuntimeError(f"Network measurement failed: {exc}") from exc
 
 
 def run_speedtest(settings: SpeedTestSettings) -> SpeedTestResult:
