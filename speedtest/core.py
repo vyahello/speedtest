@@ -27,12 +27,16 @@ class Transport(ABC):
         self, _url: str, *, timeout_s: float, read_limit_bytes: int | None = None
     ) -> HttpTimings:
         """Perform an HTTP GET and return timings."""
-        ...
+
+        _ = (_url, timeout_s, read_limit_bytes)
+        raise NotImplementedError
 
     @abstractmethod
     def post(self, _url: str, *, timeout_s: float, body_bytes: int) -> HttpTimings:
         """Perform an HTTP POST and return timings."""
-        ...
+
+        _ = (_url, timeout_s, body_bytes)
+        raise NotImplementedError
 
 
 @dataclass(frozen=True, slots=True)

@@ -127,7 +127,7 @@ def main(argv: list[str] | None = None) -> None:
 
     if args.json:
         payload = {"settings": asdict(settings), "result": asdict(result)}
-        print(json.dumps(payload, indent=2, sort_keys=True))
+        sys.stdout.write(json.dumps(payload, indent=2, sort_keys=True) + "\n")
         return
 
     console.print(_result_table(settings, result))
